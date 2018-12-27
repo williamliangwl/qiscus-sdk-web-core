@@ -113,28 +113,28 @@ class QiscusSDK extends EventEmitter {
     const self = this;
     const isSelected = self.selected || self.selected.id !== roomId;
     const isChannel = self.selected.isChannel;
-    if(!isSelected || isChannel) return false;
+    if (!isSelected || isChannel) return false;
     self.userAdapter.updateCommentStatus(roomId, commentId, null)
-    .then( res => {
-      // ambil semua yang belum di read selain komen ini, kemudian mark as read
-      // self.sortComments()
-    })
+      .then(res => {
+        // ambil semua yang belum di read selain komen ini, kemudian mark as read
+        // self.sortComments()
+      })
   }
 
   receiveComment(roomId, commentId) {
     const self = this;
     const isSelected = self.selected != null;
     const isChannel = (self.selected) ? self.selected.isChannel : false;
-    if(isChannel) return false;
+    if (isChannel) return false;
     self.userAdapter.updateCommentStatus(roomId, null, commentId)
-    .then( res => {
-      // self.sortComments()
-    })
+      .then(res => {
+        // self.sortComments()
+      })
   }
 
   setEventListeners() {
     const self = this;
-    self.on("start-init", function(response) {
+    self.on("start-init", function (response) {
       self.HTTPAdapter = new HttpAdapter({
         baseURL: self.baseURL,
         AppId: self.AppId,
@@ -145,18 +145,18 @@ class QiscusSDK extends EventEmitter {
       self.authAdapter = new AuthAdapter(self.HTTPAdapter);
     });
 
-    self.on("room-changed", function(room) {
+    self.on("room-changed", function (room) {
       this.logging("room changed", room);
       if (self.options.roomChangedCallback)
         self.options.roomChangedCallback(room);
     });
 
-    self.on("file-uploaded", function(url) {
+    self.on("file-uploaded", function (url) {
       if (self.options.fileUploadedCallback)
         self.options.fileUploadedCallback(url);
     });
 
-    self.on("profile-updated", function(user) {
+    self.on("profile-updated", function (user) {
       self.username = user.name;
       self.avatar_url = user.avatar_url;
       if (self.options.updateProfileCallback)
@@ -168,7 +168,7 @@ class QiscusSDK extends EventEmitter {
      * @param {string} data - JSON Response from SYNC API / MQTT
      * @return {void}
      */
-    self.on("newmessages", function(comments) {
+    self.on("newmessages", function (comments) {
       // let's convert the data into something we can use
       // first we need to make sure we sort this data out based on room_id
       this.logging("newmessages", comments);
@@ -193,7 +193,7 @@ class QiscusSDK extends EventEmitter {
           if (!isAlreadyRead) {
             if (self.user_id != comment.email) {
               self.receiveComment(comment.room_id, comment.id);
-              if(self.selected && comment.room_id == self.selected.id) self.readComment(comment.room_id, comment.id);
+              if (self.selected && comment.room_id == self.selected.id) self.readComment(comment.room_id, comment.id);
             }
             self.updateLastReceivedComment(comment.id);
           }
@@ -236,7 +236,7 @@ class QiscusSDK extends EventEmitter {
         // get last comment and update room status for it
         if (!isAlreadyRead && self.user_id != comment.email) {
           self.receiveComment(comment.room_id, comment.id);
-          if(self.selected && comment.room_id == self.selected.id) self.readComment(comment.room_id, comment.id);
+          if (self.selected && comment.room_id == self.selected.id) self.readComment(comment.room_id, comment.id);
         }
         // let's update last_received_comment_id
         self.updateLastReceivedComment(comment.id);
@@ -290,12 +290,12 @@ class QiscusSDK extends EventEmitter {
     /**
      * Called when there's something wrong when connecting to qiscus SDK
      */
-    self.on("login-error", function(error) {
+    self.on("login-error", function (error) {
       if (self.options.loginErrorCallback)
         self.options.loginErrorCallback(error);
     });
 
-    self.on("room-cleared", function(room) {
+    self.on("room-cleared", function (room) {
       // find room
       const roomToClear = self.rooms.find(r => r.unique_id == room.unique_id);
       if (roomToClear) {
@@ -309,7 +309,7 @@ class QiscusSDK extends EventEmitter {
         self.options.roomClearedCallback(room);
     });
 
-    self.on("comment-deleted", function(data) {
+    self.on("comment-deleted", function (data) {
       // get to the room id and delete the comment
       const { roomId, commentUniqueIds, isForEveryone, isHard } = data;
       const roomToBeFound = self.rooms.find(room => room.id == roomId);
@@ -336,8 +336,8 @@ class QiscusSDK extends EventEmitter {
     /**
      * Called when the comment has been delivered
      */
-    self.on("comment-delivered", function(response) {
-      if(!response) return false;
+    self.on("comment-delivered", function (response) {
+      if (!response) return false;
       if (self.options.commentDeliveredCallback)
         return self.options.commentDeliveredCallback(response);
       // find comment with the id or unique id listed from response
@@ -348,7 +348,7 @@ class QiscusSDK extends EventEmitter {
     /**
      * Called when new chatroom has been created
      */
-    self.on("chat-room-created", function(response) {
+    self.on("chat-room-created", function (response) {
       self.isLoading = false;
       if (self.options.chatRoomCreatedCallback)
         self.options.chatRoomCreatedCallback(response);
@@ -357,7 +357,7 @@ class QiscusSDK extends EventEmitter {
     /**
      * Called when a new room with type of group has been created
      */
-    self.on("group-room-created", function(response) {
+    self.on("group-room-created", function (response) {
       self.isLoading = false;
       if (self.options.groupRoomCreatedCallback)
         self.options.groupRoomCreatedCallback(response);
@@ -366,7 +366,7 @@ class QiscusSDK extends EventEmitter {
     /**
      * Called when user clicked on Chat SDK Header
      */
-    self.on("header-clicked", function(response) {
+    self.on("header-clicked", function (response) {
       if (self.options.headerClickedCallback)
         self.options.headerClickedCallback(response);
     });
@@ -374,7 +374,7 @@ class QiscusSDK extends EventEmitter {
     /**
      * Called when a comment has been read
      */
-    self.on("comment-read", function(response) {
+    self.on("comment-read", function (response) {
       if (self.options.commentReadCallback)
         self.options.commentReadCallback(response);
     });
@@ -383,27 +383,27 @@ class QiscusSDK extends EventEmitter {
      * Called when there's new presence data of currently subscribed target user (last seen timestamp)
      * @param {string} data MQTT Payload with format of "x:xxxxxxxxxxxxx"
      */
-    self.on("presence", function(data) {
+    self.on("presence", function (data) {
       const payload = data.split(":");
       if (self.chatmateStatus != payload[0]) {
         self.chatmateStatus =
           payload[0] == 1
             ? "Online"
             : `Last seen ${distanceInWordsToNow(
-                Number(payload[1].substring(0, 13))
-              )}`;
+              Number(payload[1].substring(0, 13))
+            )}`;
       }
       if (self.options.presenceCallback) self.options.presenceCallback(data);
     });
 
-    self.on("typing", function(data) {
+    self.on("typing", function (data) {
       if (self.options.typingCallback) self.options.typingCallback(data);
     });
 
     /**
      * Called when user clicked on Message Info
      */
-    self.on("message-info", function(response) {
+    self.on("message-info", function (response) {
       if (self.options.messageInfoCallback)
         self.options.messageInfoCallback(response);
     });
@@ -411,7 +411,7 @@ class QiscusSDK extends EventEmitter {
     /**
      * Called when new particant was added into a group
      */
-    self.on("participants-added", function(response) {
+    self.on("participants-added", function (response) {
       const self = this;
       if (!response) return;
       const participants = self.selected.participants.concat(response);
@@ -421,7 +421,7 @@ class QiscusSDK extends EventEmitter {
     /**
      * Called when particant was removed from a group
      */
-    self.on("participants-removed", function(response) {
+    self.on("participants-removed", function (response) {
       if (!response) return;
       const participants = this.selected
         .participants.filter(participant => response.indexOf(participant.email) <= -1);
@@ -431,7 +431,7 @@ class QiscusSDK extends EventEmitter {
     /**
      * Called when user was added to blocked list
      */
-    self.on("block-user", function(response) {
+    self.on("block-user", function (response) {
       if (self.options.blockUserCallback)
         self.options.blockUserCallback(response);
     });
@@ -439,7 +439,7 @@ class QiscusSDK extends EventEmitter {
     /**
      * Called when user was removed from blocked list
      */
-    self.on("unblock-user", function(response) {
+    self.on("unblock-user", function (response) {
       if (self.options.unblockUserCallback)
         self.options.unblockUserCallback(response);
     });
@@ -602,16 +602,16 @@ class QiscusSDK extends EventEmitter {
         console.log("Trying Initial Subscribe");
       }
 
-      if(this.realtimeAdapter !== null){
+      if (this.realtimeAdapter !== null) {
         if (this.debugMode) {
           console.log(this.realtimeAdapter);
           console.log("MQTT Connected");
         }
         clearInterval(initialSubscribe);
 
-      // before we unsubscribe, we need to get the userId first
-      // and only unsubscribe if the previous room is having a type of 'single'
-        if (room.room_type === "single" && targetUserId.length > 0){
+        // before we unsubscribe, we need to get the userId first
+        // and only unsubscribe if the previous room is having a type of 'single'
+        if (room.room_type === "single" && targetUserId.length > 0) {
           // this.realtimeAdapter.unsubscribeRoomPresence(targetUserId[0].email);
           this.realtimeAdapter.subscribeRoomPresence(targetUserId[0].email);
         }
@@ -675,18 +675,18 @@ class QiscusSDK extends EventEmitter {
       if (last_comment) self.readComment(room.id, last_comment.id);
 
       return this.roomAdapter.getOrCreateRoom(userId, options, distinctId).then(
-      response => {
-        const loaded_room = new Room(response);
-        room.comments = loaded_room.comments;
-        room.participants = loaded_room.participants;
-        room.options = loaded_room.options;
+        response => {
+          const loaded_room = new Room(response);
+          room.comments = loaded_room.comments;
+          room.participants = loaded_room.participants;
+          room.options = loaded_room.options;
 
-        return Promise.resolve(room)
-      }, (err) => {
-        console.error('Error when creating room', err)
-        self.isLoading = false
-        return Promise.reject(err)
-      })
+          return Promise.resolve(room)
+        }, (err) => {
+          console.error('Error when creating room', err)
+          self.isLoading = false
+          return Promise.reject(err)
+        })
 
     }
 
@@ -805,7 +805,7 @@ class QiscusSDK extends EventEmitter {
       .then((response) => {
         // make sure the room hasn't been pushed yet
         let room
-        let roomToFind = self.rooms.find(room => { id: id});
+        let roomToFind = self.rooms.find(room => { id: id });
         if (!roomToFind) {
           room = new Room(response)
           self.room_name_id_map[room.name] = room.id
@@ -816,7 +816,7 @@ class QiscusSDK extends EventEmitter {
         self.last_received_comment_id = (self.last_received_comment_id < room.last_comment_id) ? room.last_comment_id : self.last_received_comment_id
         self.setActiveRoom(room)
         self.isLoading = false
-        const last_comment = room.comments[room.comments.length-1];
+        const last_comment = room.comments[room.comments.length - 1];
         if (last_comment) self.readComment(room.id, last_comment.id);
         this.realtimeAdapter.subscribeChannel(this.AppId, room.unique_id);
         return Promise.resolve(room);
@@ -837,7 +837,7 @@ class QiscusSDK extends EventEmitter {
    * @memberof QiscusSDK
    */
   sortComments() {
-    this.selected && this.selected.comments.sort(function(leftSideComment, rightSideComment) {
+    this.selected && this.selected.comments.sort(function (leftSideComment, rightSideComment) {
       return leftSideComment.unix_timestamp - rightSideComment.unix_timestamp;
     });
   }
@@ -974,11 +974,11 @@ class QiscusSDK extends EventEmitter {
       var replied_message = self.selected.comments.find(cmt => cmt.id == parsedPayload.replied_comment_id)
       parsedPayload.replied_comment_message =
         (replied_message.type == 'reply') ? replied_message.payload.text
-                                          : replied_message.message;
+          : replied_message.message;
       parsedPayload.replied_comment_sender_username = replied_message.username_as
       pendingComment.payload = parsedPayload
     }
-    if(self.selected) self.selected.comments.push(pendingComment);
+    if (self.selected) self.selected.comments.push(pendingComment);
 
     const extrasToBeSubmitted = extras || self.extras;
     return this.userAdapter
@@ -992,7 +992,7 @@ class QiscusSDK extends EventEmitter {
       )
       .then(
         res => {
-          if(!self.selected) return Promise.resolve(res);
+          if (!self.selected) return Promise.resolve(res);
           // When the posting succeeded, we mark the Comment as sent,
           // so all the interested party can be notified.
           pendingComment.markAsSent();
@@ -1232,7 +1232,7 @@ class QiscusSDK extends EventEmitter {
     xhr.setRequestHeader("qiscus_sdk_app_id", `${self.AppId}`);
     xhr.setRequestHeader("qiscus_sdk_user_id", `${self.user_id}`);
     xhr.setRequestHeader("qiscus_sdk_token", `${self.userData.token}`);
-    xhr.onload = function() {
+    xhr.onload = function () {
       if (xhr.status === 200) {
         // file(s) uploaded), let's post to comment
         var url = JSON.parse(xhr.response).results.file.url;
@@ -1346,6 +1346,35 @@ class QiscusSDK extends EventEmitter {
   }
   unsubscribeEvent(...args) {
     this.customEventAdapter.unsubscribeEvent(...args)
+  }
+
+  initQismo(
+    email,
+    username,
+    nonce,
+    avatar = 'https://d1edrlpyc25xu0.cloudfront.net/kiwari-prod/image/upload/wMWsDZP6ta/1516689726-ic_qiscus_client.png',
+    extras = {}) {
+    const defaultExtras = {
+      timezone_offet: 7
+    };
+    return request('POST', `https://qismo.herokuapp.com/api/v1/qiscus/initiate_chat`)
+      .set('Content-Type', 'application/json')
+      .set('QISCUS_SDK_APP_ID', self.AppId)
+      .send({
+        app_id: self.AppId,
+        avatar,
+        name: username,
+        user_id: email,
+        nonce,
+        extras: JSON.stringify({
+          ...defaultExtras,
+          ...extras
+        })
+      })
+      .then(
+        res => Promise.resolve(res.body.data),
+        err => Promise.reject(err)
+      );
   }
 }
 
