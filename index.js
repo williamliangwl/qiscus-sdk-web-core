@@ -1359,9 +1359,9 @@ class QiscusSDK extends EventEmitter {
     };
     return request('POST', `https://qismo.herokuapp.com/api/v1/qiscus/initiate_chat`)
       .set('Content-Type', 'application/json')
-      .set('QISCUS_SDK_APP_ID', self.AppId)
+      .set("qiscus_sdk_app_id", `${this.AppId}`)
       .send({
-        app_id: self.AppId,
+        app_id: this.AppId,
         avatar,
         name: username,
         user_id: email,
